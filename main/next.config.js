@@ -4,18 +4,6 @@ const { MF_PUBLIC_ONLY, MF_AUTH_ONLY, MF_MIXED } = process.env;
 const nextConfig = {
   async rewrites() {
     return [
-      // MF que tem todas as rotas de acesso públicos
-      {
-        source: "/", // grupo de controle
-        destination: `${MF_PUBLIC_ONLY}/public-only`, // MF responsável
-      },
-      // O objeto abaixo pode levar a comportamentos inesperados
-      // devido a possibilidade de conflito com as demais rotas
-      // caso tenham os mesmos nomes
-      {
-        source: "/:path",
-        destination: `${MF_PUBLIC_ONLY}/public-only/:path*`,
-      },
       // MF que tem todas as rotas autenticadas
       //
       // Obs.: Cada deve configurar o próprio middleware com next-auth
@@ -27,15 +15,32 @@ const nextConfig = {
       //   source: "/auth-only/:path",
       //   destination: `${MF_AUTH_ONLY}/auth-only/:path*`,
       // },
-      // // MF que tem rotas públicas e autenticadas
-      // {
-      //   source: "/mixed",
-      //   destination: `${MF_MIXED}/mixed`,
-      // },
-      // {
-      //   source: "/mixed/:path",
-      //   destination: `${MF_MIXED}/mixed/:path*`,
-      // },
+      // MF que tem rotas públicas e autenticadas
+      {
+        source: "/mixed",
+        destination: `${MF_MIXED}/mixed`,
+      },
+      {
+        source: "/mixed/:path",
+        destination: `${MF_MIXED}/mixed/:path*`,
+      },
+      // MF que tem todas as rotas de acesso públicos
+      //
+      // Obs.: O código abaixo consegue manipular todas as rotas base da URL
+      // logo para que as demais rotas como /mixed e /auth-only funcionem
+      // esse objeto SEMPRE deve ser o último da lista, caso contrário
+      // nenhum outro MF vai conseguir se conectar
+      {
+        source: "/", // grupo de controle
+        destination: `${MF_PUBLIC_ONLY}/public-only`, // MF responsável
+      },
+      // O objeto abaixo pode levar a comportamentos inesperados
+      // devido a possibilidade de conflito com as demais rotas
+      // caso tenham os mesmos nomes
+      {
+        source: "/:path",
+        destination: `${MF_PUBLIC_ONLY}/public-only/:path*`,
+      },
     ]
   },
   async redirects() {

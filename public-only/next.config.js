@@ -1,4 +1,4 @@
-const { NEXT_PUBLIC_BASE_URL } = process.env;
+const { NEXT_PUBLIC_BASE_URL, NEXT_PUBLIC_MAIN_MF_URL } = process.env;
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -23,13 +23,11 @@ const nextConfig = {
           // Permite que o MF main baixe os recursos do MF atual (css, js, etc)
           //
           // Obs.: Importante definir o assetPrefix
-          { key: "Access-Control-Allow-Origin", value: "http://localhost:3000" }
+          { key: "Access-Control-Allow-Origin", value: NEXT_PUBLIC_MAIN_MF_URL }
         ]
       },
     ]
   }
-
-
 }
 
 module.exports = nextConfig
