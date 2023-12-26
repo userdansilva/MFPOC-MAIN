@@ -1,7 +1,7 @@
-const AuthOnly: React.FC = () => (
+const AuthOnly = () => (
   <div>
-    This is authenticated only
+    <h1>AuthOnly </h1>
   </div>
 )
 
-export default AuthOnly;
+export default AuthOnly

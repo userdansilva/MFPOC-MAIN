@@ -1,9 +1,9 @@
-import { getServerSession } from "next-auth";
 import { Tabs } from "../components/Tabs";
 import { SignOutButton } from "../components/SignOutButton";
+import { auth } from "@/auth";
 
 const getData = async () => {
-  const session = await getServerSession();
+  const session = await auth();
 
   return {
     session
