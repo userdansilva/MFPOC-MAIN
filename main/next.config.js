@@ -15,6 +15,9 @@ const nextConfig = {
       //   source: "/auth-only/:path",
       //   destination: `${MF_AUTH_ONLY}/auth-only/:path*`,
       // },
+      //
+      // -------------------------------------------------------------------
+      //
       // MF que tem rotas públicas e autenticadas
       {
         source: "/mixed",
@@ -26,6 +29,8 @@ const nextConfig = {
       },
       // MF que tem todas as rotas de acesso públicos
       //
+      // -------------------------------------------------------------------
+      //
       // Obs.: O código abaixo consegue manipular todas as rotas base da URL
       // logo para que as demais rotas como /mixed e /auth-only funcionem
       // esse objeto SEMPRE deve ser o último da lista, caso contrário
@@ -36,7 +41,8 @@ const nextConfig = {
       },
       // O objeto abaixo pode levar a comportamentos inesperados
       // devido a possibilidade de conflito com as demais rotas
-      // caso tenham os mesmos nomes
+      // caso tenham os mesmos nomes, para evitar isso, esse deve ser o último
+      // item dos rewrites, assim conflitos de rotas iram priorizar as demais
       {
         source: "/:path",
         destination: `${MF_PUBLIC_ONLY}/public-only/:path*`,
@@ -50,9 +56,6 @@ const nextConfig = {
       //
       // Obs.: Não deve modificar as configurações padrões de
       // page do next-auth [...next-auth].ts dos MFs
-      //
-      // Obs.: Caso alterer a tela de login do next-auth da main
-      // deve ser alterado aqui, mas NUNCA nos demais MFs
       {
         source: '/(.*)/api/auth/signin',
         destination: `/api/auth/signin`,

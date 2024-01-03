@@ -1,6 +1,5 @@
 import NextAuth, { DefaultSession, NextAuthOptions } from "next-auth";
 import AzureADB2CProvider from "next-auth/providers/azure-ad-b2c";
-// import { cookies } from 'next/headers'
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -40,17 +39,12 @@ export const authOptions: NextAuthOptions = {
         };
       }
 
-      // if ((token.expiresAt as number - Date.now()) > (60 * 1000)) {
-      console.log(token.expiresAt);
-
-      if ((token.expiresAt as number - Date.now()) > (60 * 4 * 1000)) { // 1 min
-        console.log("called jwt -> if: main");
+      // Para revalidar a cada 1 min use 60 * 4 * 1000 // 4 min
+      if ((token.expiresAt as number - Date.now()) > (60 * 1000)) { // 1 min
         return token;
       }
 
       try {
-        console.log("called jwt -> try: main");
-
         const response = await fetch(`https://${process.env.NEXT_PUBLIC_AZURE_AD_B2C_TENANT_NAME}.b2clogin.com/${process.env.NEXT_PUBLIC_AZURE_AD_B2C_TENANT_NAME}.onmicrosoft.com/${process.env.NEXT_PUBLIC_AZURE_AD_B2C_PRIMARY_USER_FLOW}/oauth2/v2.0/token`, {
           method: "POST",
           headers: {
@@ -70,8 +64,6 @@ export const authOptions: NextAuthOptions = {
           throw tokens;
         }
 
-        console.log("token refreshed!");
-
         return {
           ...token,
           accessToken: tokens.id_token,
@@ -79,8 +71,6 @@ export const authOptions: NextAuthOptions = {
           refreshToken: tokens.refresh_token,
         };
       } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error("Error refreshing access token", error);
         return { ...token, error: "RefreshAccessTokenError" };
       }
     },
@@ -97,8 +87,8 @@ export const authOptions: NextAuthOptions = {
     },
   },
   session: {
-    // maxAge: 60 * 59, // 59 minutes
-    maxAge: 15 * 60 // 1 min
+    // Tempo máximo que é possível fazer o token refresh
+    maxAge: 60 * (process.env.TOKEN_REFRESH_MAX_AGE ? parseInt(process.env.TOKEN_REFRESH_MAX_AGE) : 59), // 59 minutes
   },
 }
 
