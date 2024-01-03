@@ -1,6 +1,6 @@
 import NextAuth, { DefaultSession, NextAuthOptions } from "next-auth";
 import AzureADB2CProvider from "next-auth/providers/azure-ad-b2c";
-import { cookies } from 'next/headers'
+// import { cookies } from 'next/headers'
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -12,11 +12,6 @@ export const authOptions: NextAuthOptions = {
       authorization: { params: { scope: "offline_access openid" } },
     })
   ],
-  events: {
-    signOut() {
-      cookies().delete("expiresAt");
-    },
-  },
   callbacks: {
     async redirect({ url, baseUrl }) {
       // Allows relative callback URLs
@@ -35,17 +30,7 @@ export const authOptions: NextAuthOptions = {
       return baseUrl;
     },
     async jwt({ token, account }) {
-      console.log("called jwt: main");
-      // called when login
       if (account) {
-        console.log("called jwt -> account: main");
-
-        const expiresAt = Date.now()
-          + (account.id_token_expires_in as number * 1000)
-
-        // --
-        cookies().set("expiresAt", expiresAt.toString());
-
         return {
           ...token,
           accessToken: account.id_token,
@@ -55,9 +40,10 @@ export const authOptions: NextAuthOptions = {
         };
       }
 
-      // O if e try abaixo só é necessário caso o main MF precise acessar algum dado
-      // do usuário autenticado, que não seria recomendado
-      if ((token.expiresAt as number - Date.now()) > (60 * 1000)) {
+      // if ((token.expiresAt as number - Date.now()) > (60 * 1000)) {
+      console.log(token.expiresAt);
+
+      if ((token.expiresAt as number - Date.now()) > (60 * 4 * 1000)) { // 1 min
         console.log("called jwt -> if: main");
         return token;
       }
@@ -84,6 +70,8 @@ export const authOptions: NextAuthOptions = {
           throw tokens;
         }
 
+        console.log("token refreshed!");
+
         return {
           ...token,
           accessToken: tokens.id_token,
@@ -99,8 +87,6 @@ export const authOptions: NextAuthOptions = {
     // O session abaixo só é necessário caso o main MF precise acessar algum dado
     // do usuário autenticado, que não seria recomendado
     async session({ session, token }) {
-      console.log("called session: main");
-
       session.accessToken = token.accessToken;
 
       if (token.error) {
@@ -116,9 +102,7 @@ export const authOptions: NextAuthOptions = {
   },
 }
 
-const handler = NextAuth(authOptions);
-
-export { handler as GET, handler as POST };
+export default NextAuth(authOptions);
 
 /** types */
 declare module "next-auth" {

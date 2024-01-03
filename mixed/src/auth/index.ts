@@ -28,56 +28,33 @@ export const authOptions: NextAuthOptions = {
       return baseUrl;
     },
     async jwt({ token }) {
-      console.log("called jwt: mixed");
-
-      // Existe algum cenário que entra nesse if ou é apenas na main? Não
-      // if (account) {
-      //   console.log("called jwt -> account: mixed");
-      //   return {
-      //     ...token,
-      //     accessToken: account.id_token,
-      //     expiresAt: Date.now()
-      //       + (account.id_token_expires_in as number * 1000),
-      //     refreshToken: account.refresh_token,
-      //   };
+      return token;
+      // if ((token.expiresAt as number - Date.now()) > (60 * 1000)) {
+      // if ((token.expiresAt as number - Date.now()) > (60 * 4 * 1000)) { // 1 min
+      //   return token;
       // }
 
-      console.log(`expiresAt: ${token.expiresAt as number - Date.now()}`);
-
-      const cookieExpiresAt = cookies().get("expiresAt");
-      const expiresAt = cookieExpiresAt ? +cookieExpiresAt : 0;
-
-      if ((expiresAt - Date.now()) > (60 * 1000)) {
-        return token;
-      }
-
       try {
-        console.log("called jwt -> try: mixed");
-        const response = await fetch(`https://${process.env.NEXT_PUBLIC_AZURE_AD_B2C_TENANT_NAME}.b2clogin.com/${process.env.NEXT_PUBLIC_AZURE_AD_B2C_TENANT_NAME}.onmicrosoft.com/${process.env.NEXT_PUBLIC_AZURE_AD_B2C_PRIMARY_USER_FLOW}/oauth2/v2.0/token`, {
+        const allCookies = cookies().getAll();
+
+        const Cookie = allCookies
+          .map((_) => `${_.name}=${_.value}`)
+          .toString()
+          .replaceAll(",", "; ");
+
+        const response = await fetch(`${process.env.NEXT_PUBLIC_MAIN_MF_URL}/api/mf/tokenRefresh`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: new URLSearchParams({
-            grant_type: "refresh_token",
-            client_id: process.env.NEXT_PUBLIC_AZURE_AD_B2C_CLIENT_ID as string,
-            client_secret: process.env.AZURE_AD_B2C_CLIENT_SECRET as string,
-            refresh_token: token.refreshToken as string,
-          }),
+          credentials: "include",
+          headers: { Cookie }
         });
 
-        const tokens = await response.json();
-
-        if (tokens.error) {
-          throw tokens;
-        }
+        const data = await response.json();
+        console.log("data:", data);
 
         return {
           ...token,
-          accessToken: tokens.id_token,
-          expiresAt: Date.now() + (tokens.id_token_expires_in * 1000),
-          refreshToken: tokens.refresh_token,
-        };
+          accessToken: data.accessToken,
+        }
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error("Error refreshing access token", error);

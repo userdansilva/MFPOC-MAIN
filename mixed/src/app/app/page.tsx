@@ -1,41 +1,22 @@
 import { Tabs } from "../components/Tabs";
 import { SignOutButton } from "../components/SignOutButton";
-import { auth } from "@/auth";
+import { UsersList } from "../components/UsersList";
+import { Suspense } from "react";
+import { Loading } from "../components/UsersList/loading";
 
-const getData = async () => {
-  const session = await auth();
+const App = () => (
+  <div className="space-y-10">
+    <Tabs selected="PRIVATE" />
 
-  return {
-    session
-  }
-}
+    <p>Bem vindo a tela autenticada</p>
 
-const App = async () => {
-  const session = await getData();
+    {/** console.log aqui */}
+    <Suspense fallback={<Loading />}>
+      <UsersList />
+    </Suspense>
 
-  console.log(session);
-
-  return (
-    <div className="space-y-10">
-      <Tabs selected="PRIVATE" />
-
-      <p>
-        {`Bem vindo a tela autenticada ${session.session?.user?.name}`}
-      </p>
-
-      <ul>
-        <li>
-          {`Nome: ${session.session?.user?.name}`}
-        </li>
-
-        <li>
-          {`E-mail: ${session.session?.user?.email}`}
-        </li>
-      </ul>
-
-      <SignOutButton />
-    </div>
-  )
-}
+    <SignOutButton />
+  </div>
+)
 
 export default App;
