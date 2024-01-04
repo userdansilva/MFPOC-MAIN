@@ -9,12 +9,12 @@ const api = axios.create({
   withCredentials: true,
 });
 
-export const AuthContext = createContext({} as AuthContextProps);
+export const AuthContext = createContext<AuthContextProps>({});
 
 const fetcher = (url: string) => api.post(url)
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  useSWR("/api/mf/tokenRefresh", fetcher, {
+  useSWR("/api/_/verify", fetcher, {
     refreshInterval: 20 * 1000, // 20s
   });
 
@@ -27,7 +27,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 /** types */
 type AuthContextProps = {
-
 }
 
 type AuthProviderProps = {
