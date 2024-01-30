@@ -2,6 +2,7 @@ const { NEXT_PUBLIC_BASE_URL, NEXT_PUBLIC_MAIN_MF_URL } = process.env;
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  crossOrigin: "anonymous",
   // Em desenvolvimento vai ser acessado como http://localhost:3000/public-only
   // no MF main é possível configurar para qualquer outra rota, mas o mais ideal
   // é que ambas tenham a mesma nomeclatura
