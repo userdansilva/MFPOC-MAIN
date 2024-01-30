@@ -1,7 +1,7 @@
 {
   "headers": [
     {
-      "source": "/public-only/(.*)",
+      "source": "/(.*)",
       "headers": [
         {
           "key": "Access-Control-Allow-Origin",

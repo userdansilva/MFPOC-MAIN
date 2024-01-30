@@ -18,12 +18,12 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: "/public-only/:path*",
+        source: "/:path*",
         headers: [
           // Permite que o MF main baixe os recursos do MF atual (css, js, etc)
           //
           // Obs.: Importante definir o assetPrefix
-          { key: "Access-Control-Allow-Origin", value: NEXT_PUBLIC_MAIN_MF_URL }
+          { key: "Access-Control-Allow-Origin", value: "*" }
         ]
       },
     ]
