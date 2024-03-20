@@ -4,7 +4,7 @@ import axios from "axios";
 const sleep = (ms: number) => new Promise((res) => setTimeout(() => res("ok"), ms))
 
 const api = axios.create({
-  baseURL: "https://jsonplaceholder.typicode.com",
+  baseURL: "http://jsonplaceholder.typicode.com",
 });
 
 const getUsers = async () => {

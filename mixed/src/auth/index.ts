@@ -1,7 +1,6 @@
 import { GetServerSidePropsContext, NextApiRequest, NextApiResponse } from "next";
 import { DefaultSession, NextAuthOptions, getServerSession } from "next-auth";
 import AzureADB2CProvider from "next-auth/providers/azure-ad-b2c";
-import { cookies } from "next/headers";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -29,37 +28,6 @@ export const authOptions: NextAuthOptions = {
     },
     async jwt({ token }) {
       return token;
-      // if ((token.expiresAt as number - Date.now()) > (60 * 1000)) {
-      // if ((token.expiresAt as number - Date.now()) > (60 * 4 * 1000)) { // 1 min
-      //   return token;
-      // }
-
-      try {
-        const allCookies = cookies().getAll();
-
-        const Cookie = allCookies
-          .map((_) => `${_.name}=${_.value}`)
-          .toString()
-          .replaceAll(",", "; ");
-
-        const response = await fetch(`${process.env.NEXT_PUBLIC_MAIN_MF_URL}/api/mf/tokenRefresh`, {
-          method: "POST",
-          credentials: "include",
-          headers: { Cookie }
-        });
-
-        const data = await response.json();
-        console.log("data:", data);
-
-        return {
-          ...token,
-          accessToken: data.accessToken,
-        }
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error("Error refreshing access token", error);
-        return { ...token, error: "RefreshAccessTokenError" };
-      }
     },
     async session({ session, token }) {
       console.log("called session: mixed");
